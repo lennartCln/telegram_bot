@@ -1,11 +1,11 @@
 from botocore.vendored import requests
 import logging
-import config 
+import config as C
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-TELEGRAM_TOKEN = config.TELEGRAM_TOKEN
+TELEGRAM_TOKEN = C.TELEGRAM['token']
 BOT_URL = "https://api.telegram.org/bot{}/".format(TELEGRAM_TOKEN)
 
 def create_response(text):
