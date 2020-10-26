@@ -1,3 +1,4 @@
 
 /deployment/config.py
 /lambda_function/config.py
+__pycache__/
