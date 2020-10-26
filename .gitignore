@@ -1,4 +1,4 @@
 
 /deployment/config.py
 /lambda_function/config.py
-__pycache__/
+**/__pycache__/
