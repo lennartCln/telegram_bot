@@ -1,24 +1,34 @@
 import boto3
 import os
+import io
 import zipfile
 
 import config as C
 
 client = boto3.client('lambda')
 
-response = client.update_function_code()
-
-
-def zip_dir(path, ziph):
+def files_to_zip(path):
     for root, dirs, files in os.walk(path):
-        for file in files:
-            ziph.write(os.path.join(root, file))
+        for f in files:
+            full_path = os.path.join(root, f)
+            print(full_path)
+            archive_name = full_path[len(path) + len(os.sep):]
+            yield full_path, archive_name
 
-def zip_dir_to(source_dir, taget_dir):
-    zipf = zipfile.ZipFile(taget_dir, 'w', zipfile.ZIP_DEFLATED)
-    zip_dir(source_dir, zipf)
-    zipf.close()
-
+def make_zip_file_bytes(path):
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, 'w') as z:
+        for full_path, archive_name in files_to_zip(path=path):
+            z.write(full_path, archive_name)
+    return buf.getvalue()
 
 if __name__ == '__main__':
-    zip_dir_to('../lambda_function/', 'lambda_function.zip')
+    lambda_code = '../lambda_function/'
+
+    response = client.update_function_code(
+        FunctionName= C.AWS['function_name'],
+        ZipFile= make_zip_file_bytes(lambda_code))
+
+    print(response)
+
+
